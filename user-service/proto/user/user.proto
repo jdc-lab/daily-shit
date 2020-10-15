@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package user;
+option go_package = ".;user";
+
+service UserService {
+  rpc Create(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc Get(GetUserRequest) returns (GetUserResponse) {}
+  rpc Auth(AuthRequest) returns (AuthResponse) {}
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message CreateUserResponse {
+  string id = 1;
+  repeated Error errors = 2;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  repeated Error errors = 5;
+}
+
+message AuthRequest {
+  string username = 1;
+  string token = 2;
+}
+
+message AuthResponse {
+  string id = 1;
+  repeated Error errors = 2;
+}
+
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool ok = 1;
+  repeated Error errors = 2;
+}
+
+message Error {
+  int32 code = 1;
+  string description = 2;
+}

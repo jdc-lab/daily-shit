@@ -5,7 +5,7 @@ DailyShit is an example microservice newspaper.
     * website
 * gateway
 * microservices
-    * login service
+    * user service
     * post service
     * comment service
     * newsletter service
@@ -14,3 +14,9 @@ DailyShit is an example microservice newspaper.
 website <-> Gateway (graphql)  
 gateway <-> microservices (gRPC)  
 microservice <-> microservice (nats) 
+
+database: mongo db
+
+`go run main.go`
+`go generate ./user-service .`
+`go run ./user-service .`
