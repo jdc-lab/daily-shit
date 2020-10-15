@@ -17,6 +17,6 @@ microservice <-> microservice (nats)
 
 database: mongo db
 
-`go run main.go`
-`go generate ./user-service .`
-`go run ./user-service .`
+`go run main.go`  
+`go generate ./user-service .`  
+`go run ./user-service .`  
