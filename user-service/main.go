@@ -1,8 +1,9 @@
-//go:generate protoc -I=proto/user --go_out=plugins=grpc:proto/user proto/user/user.proto
+//go:generate protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/user/user.proto
 package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -20,12 +21,14 @@ func main() {
 		secret = &envSecret
 	}
 
-	listener, err := net.Listen("tcp", ":4040")
+	listener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", 4040))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	srv := grpc.NewServer()
+	var opts []grpc.ServerOption
+
+	srv := grpc.NewServer(opts...)
 	pb.RegisterUserServiceServer(srv, &handler{
 		repo: &inMemoryRepository{},
 		auth: &jwtAuthenticator{[]byte(*secret)},

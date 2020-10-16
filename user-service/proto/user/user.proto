@@ -47,8 +47,9 @@ message ValidateTokenRequest {
 }
 
 message ValidateTokenResponse {
-  bool ok = 1;
-  repeated Error errors = 2;
+  bool isAdmin = 1;
+  string userId = 2;
+  int64 expires = 3;
 }
 
 message Error {

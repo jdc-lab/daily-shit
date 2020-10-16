@@ -17,6 +17,13 @@ microservice <-> microservice (nats)
 
 database: mongo db
 
-`go run main.go`  
+# Development requirements
+
+install protoc:  
+https://grpc.io/docs/languages/go/quickstart/
+
+# Run
+
 `go generate ./user-service .`  
 `go run ./user-service .`  
+`go run main.go`  

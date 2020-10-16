@@ -46,6 +46,14 @@ func main() {
 	}
 	log.Printf("auth: %v", authReq)
 
+	validateReq, err := c.ValidateToken(ctx, &pb.ValidateTokenRequest{
+		Token: authReq.Token,
+	})
+	if err != nil {
+		log.Fatalf("could not validate token: %v", err)
+	}
+	log.Printf("validate: %v", validateReq)
+
 	getReq, err := c.Get(ctx, &pb.GetUserRequest{Id: createReq.Id})
 	if err != nil {
 		log.Fatalf("could not get user: %v", err)

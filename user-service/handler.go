@@ -16,17 +16,18 @@ type repository interface {
 
 type authenticator interface {
 	NewToken(ctx context.Context, userId string) (string, error)
-	Validate(ctx context.Context, token string)
+	Validate(ctx context.Context, tokenString string) (JwtClaims, error)
 }
 
 type handler struct {
+	pb.UnimplementedUserServiceServer
 	repo repository
 	auth authenticator
 }
 
-func (h handler) Create(ctx context.Context, u *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+func (h handler) Create(ctx context.Context, request *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	res := new(pb.CreateUserResponse)
-	if id, err := h.repo.Create(ctx, u.Username, u.Email, u.Password); err != nil {
+	if id, err := h.repo.Create(ctx, request.GetUsername(), request.GetEmail(), request.GetPassword()); err != nil {
 		res.Errors = append(res.Errors, &pb.Error{
 			Code:        1,
 			Description: err.Error(),
@@ -38,9 +39,9 @@ func (h handler) Create(ctx context.Context, u *pb.CreateUserRequest) (*pb.Creat
 	return res, nil
 }
 
-func (h handler) Get(ctx context.Context, u *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+func (h handler) Get(ctx context.Context, request *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 	res := new(pb.GetUserResponse)
-	if user, err := h.repo.Get(ctx, u.Id); err != nil {
+	if user, err := h.repo.Get(ctx, request.GetId()); err != nil {
 		res.Errors = append(res.Errors, &pb.Error{
 			Code:        1,
 			Description: err.Error(),
@@ -55,19 +56,19 @@ func (h handler) Get(ctx context.Context, u *pb.GetUserRequest) (*pb.GetUserResp
 }
 
 func (h handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.AuthResponse, error) {
-	user, err := h.repo.GetByName(ctx, request.Username)
+	user, err := h.repo.GetByName(ctx, request.GetUsername())
 	if err != nil {
-		return nil, fmt.Errorf("could not get name %w", err)
+		return nil, fmt.Errorf("could not get name\n%w", err)
 	}
 
-	bcrypt.CompareHashAndPassword([]byte(user.passwordHash), []byte(request.Password))
+	bcrypt.CompareHashAndPassword([]byte(user.passwordHash), []byte(request.GetPassword()))
 	if err != nil {
-		return nil, fmt.Errorf("could not validate password %w", err)
+		return nil, fmt.Errorf("could not validate password\n%w", err)
 	}
 
 	token, err := h.auth.NewToken(ctx, user.id)
 	if err != nil {
-		return nil, fmt.Errorf("could not generate token %w", err)
+		return nil, fmt.Errorf("could not generate token\n%w", err)
 	}
 
 	return &pb.AuthResponse{
@@ -77,5 +78,15 @@ func (h handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.AuthRes
 }
 
 func (h handler) ValidateToken(ctx context.Context, request *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
-	panic("implement me")
+	claims, err := h.auth.Validate(ctx, request.GetToken())
+
+	if err != nil {
+		return nil, fmt.Errorf("invalid token\n%w", err)
+	}
+
+	return &pb.ValidateTokenResponse{
+		IsAdmin: claims.IsAdmin,
+		UserId:  claims.UserId,
+		Expires: claims.Expires,
+	}, nil
 }
