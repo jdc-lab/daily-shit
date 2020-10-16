@@ -14,11 +14,16 @@ import (
 
 func main() {
 	secret := flag.String("jwt-secret", "", "the jwt secret to be used, can also be provided using the environment variable 'JWT_SECRET'")
+
 	flag.Parse()
 
-	if secret == nil || *secret == "" {
-		envSecret := os.Getenv("JWT_SECRTET")
+	if *secret == "" {
+		envSecret := os.Getenv("JWT_SECRET")
 		secret = &envSecret
+	}
+
+	if *secret == "" {
+		panic("empty secret")
 	}
 
 	listener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", 4040))

@@ -30,7 +30,7 @@ func (r *inMemoryRepository) init() {
 	}
 }
 
-func (r *inMemoryRepository) Create(ctx context.Context, username string, email string, password string) (string, error) {
+func (r *inMemoryRepository) Create(_ context.Context, username string, email string, password string) (string, error) {
 	r.init()
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
@@ -51,7 +51,7 @@ func (r *inMemoryRepository) Create(ctx context.Context, username string, email 
 	return u.id, nil
 }
 
-func (r *inMemoryRepository) Get(ctx context.Context, id string) (user, error) {
+func (r *inMemoryRepository) Get(_ context.Context, id string) (user, error) {
 	r.init()
 
 	if u, ok := r.users[id]; ok {
@@ -61,7 +61,7 @@ func (r *inMemoryRepository) Get(ctx context.Context, id string) (user, error) {
 	return user{}, errors.New("user not found")
 }
 
-func (r *inMemoryRepository) GetByName(ctx context.Context, username string) (user, error) {
+func (r *inMemoryRepository) GetByName(_ context.Context, username string) (user, error) {
 	r.init()
 
 	if u, ok := r.usersByName[username]; ok {
