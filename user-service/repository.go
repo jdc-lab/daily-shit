@@ -16,12 +16,17 @@ type user struct {
 }
 
 type inMemoryRepository struct {
-	users map[string]user
+	users       map[string]*user
+	usersByName map[string]*user
 }
 
 func (r *inMemoryRepository) init() {
 	if r.users == nil {
-		r.users = make(map[string]user)
+		r.users = make(map[string]*user)
+	}
+
+	if r.usersByName == nil {
+		r.usersByName = make(map[string]*user)
 	}
 }
 
@@ -40,7 +45,8 @@ func (r *inMemoryRepository) Create(ctx context.Context, username string, email 
 		passwordHash: string(hash),
 	}
 
-	r.users[u.id] = u
+	r.users[u.id] = &u
+	r.usersByName[u.username] = &u
 
 	return u.id, nil
 }
@@ -49,7 +55,17 @@ func (r *inMemoryRepository) Get(ctx context.Context, id string) (user, error) {
 	r.init()
 
 	if u, ok := r.users[id]; ok {
-		return u, nil
+		return *u, nil
+	}
+
+	return user{}, errors.New("user not found")
+}
+
+func (r *inMemoryRepository) GetByName(ctx context.Context, username string) (user, error) {
+	r.init()
+
+	if u, ok := r.usersByName[username]; ok {
+		return *u, nil
 	}
 
 	return user{}, errors.New("user not found")

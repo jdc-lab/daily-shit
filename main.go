@@ -37,6 +37,15 @@ func main() {
 	}
 	log.Printf("user id: %s", createReq.GetId())
 
+	authReq, err := c.Auth(ctx, &pb.AuthRequest{
+		Username: u.Username,
+		Password: u.Password,
+	})
+	if err != nil {
+		log.Fatalf("could not authenticate user: %v", err)
+	}
+	log.Printf("auth: %v", authReq)
+
 	getReq, err := c.Get(ctx, &pb.GetUserRequest{Id: createReq.Id})
 	if err != nil {
 		log.Fatalf("could not get user: %v", err)

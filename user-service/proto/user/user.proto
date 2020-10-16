@@ -34,12 +34,12 @@ message GetUserResponse {
 
 message AuthRequest {
   string username = 1;
-  string token = 2;
+  string password = 2;
 }
 
 message AuthResponse {
   string id = 1;
-  repeated Error errors = 2;
+  string token = 2;
 }
 
 message ValidateTokenRequest {

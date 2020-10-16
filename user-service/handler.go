@@ -2,17 +2,26 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	pb "./proto/user"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type repository interface {
 	Create(ctx context.Context, username string, email string, password string) (string, error)
 	Get(ctx context.Context, id string) (user, error)
+	GetByName(ctx context.Context, username string) (user, error)
+}
+
+type authenticator interface {
+	NewToken(ctx context.Context, userId string) (string, error)
+	Validate(ctx context.Context, token string)
 }
 
 type handler struct {
 	repo repository
+	auth authenticator
 }
 
 func (h handler) Create(ctx context.Context, u *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
@@ -46,7 +55,25 @@ func (h handler) Get(ctx context.Context, u *pb.GetUserRequest) (*pb.GetUserResp
 }
 
 func (h handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.AuthResponse, error) {
-	panic("implement me")
+	user, err := h.repo.GetByName(ctx, request.Username)
+	if err != nil {
+		return nil, fmt.Errorf("could not get name %w", err)
+	}
+
+	bcrypt.CompareHashAndPassword([]byte(user.passwordHash), []byte(request.Password))
+	if err != nil {
+		return nil, fmt.Errorf("could not validate password %w", err)
+	}
+
+	token, err := h.auth.NewToken(ctx, user.id)
+	if err != nil {
+		return nil, fmt.Errorf("could not generate token %w", err)
+	}
+
+	return &pb.AuthResponse{
+		Id:    user.id,
+		Token: token,
+	}, nil
 }
 
 func (h handler) ValidateToken(ctx context.Context, request *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
