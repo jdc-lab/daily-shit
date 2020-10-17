@@ -7,7 +7,7 @@ import (
 	"net"
 	"os"
 
-	pb "daily-shit/proto/user"
+	pb "daily-shit/user-service/proto/user"
 
 	"google.golang.org/grpc"
 )

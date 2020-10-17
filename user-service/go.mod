@@ -1,4 +1,4 @@
-module daily-shit
+module daily-shit/user-service
 
 go 1.15
 

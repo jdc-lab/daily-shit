@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pb "daily-shit/proto/user"
+	pb "daily-shit/user-service/proto/user"
 
 	"golang.org/x/crypto/bcrypt"
 )
