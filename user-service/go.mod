@@ -1,4 +1,4 @@
-module daily-shit/user-service
+module github.com/jdc-lab/daily-shit/user-service
 
 go 1.15
 
