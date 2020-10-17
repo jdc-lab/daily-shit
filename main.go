@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "./user-service/proto/user"
+	pb "daily-shit/user-service/proto/user"
 )
 
 func main() {
