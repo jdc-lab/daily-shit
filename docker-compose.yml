@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  consul-service:
+    image: consul:latest
+    ports:
+      - 8500:8500
+      - 8600:8600/udp
+    volumes:
+      # - ./docker/data/consul/data:/consul/data
+      - ./consul/config:/consul/config
+    command: agent -server -ui -node=consul-1 -client=0.0.0.0 -bootstrap -datacenter DailyShit
+    networks:
+      - daily-shit
+
+  user-service:
+    hostname: user-service
+    build:
+      context: ./user-service
+    restart: unless-stopped
+    environment:
+      - JWT_SECRET=REPLACEthisSecret
+      - CONSUL_HOST=consul-service:8500
+    networks:
+      - daily-shit
+  user-service2:
+    hostname: user-service2
+    build:
+      context: ./user-service
+    restart: unless-stopped
+    environment:
+      - JWT_SECRET=REPLACEthisSecret
+      - CONSUL_HOST=consul-service:8500
+    networks:
+      - daily-shit
+networks:
+  daily-shit:

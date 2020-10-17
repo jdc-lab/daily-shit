@@ -3,12 +3,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net"
 	"os"
 
-	pb "daily-shit/user-service/proto/user"
+	pb "daily-shit/proto/user"
 
 	"google.golang.org/grpc"
 )
@@ -24,22 +23,23 @@ func main() {
 	}
 
 	if *secret == "" {
-		panic("empty secret")
+		log.Fatal("empty secret")
 	}
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", 4040))
+	listener, err := net.Listen("tcp", port())
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	var opts []grpc.ServerOption
-
-	srv := grpc.NewServer(opts...)
+	srv := grpc.NewServer()
 	pb.RegisterUserServiceServer(srv, &handler{
 		repo: &inMemoryRepository{},
 		auth: &jwtAuthenticator{[]byte(*secret)},
 	})
 
+	registerServiceWithConsul("user-service")
+
+	log.Println("setup finished - starting service")
 	if e := srv.Serve(listener); e != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

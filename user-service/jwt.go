@@ -50,7 +50,7 @@ func (a jwtAuthenticator) NewToken(_ context.Context, userId string, isAdmin boo
 
 func (a jwtAuthenticator) Validate(_ context.Context, tokenString string) (JwtClaims, error) {
 	var claims JwtClaims
-	token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
 		// Validate expected algorithm
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -62,8 +62,6 @@ func (a jwtAuthenticator) Validate(_ context.Context, tokenString string) (JwtCl
 	if err != nil {
 		return JwtClaims{}, fmt.Errorf("could not parse claims:\n%w", err)
 	}
-
-	fmt.Println(token.Claims)
 
 	if err := claims.Valid(); err != nil {
 		return JwtClaims{}, fmt.Errorf("invalid claims:\n%w", err)
