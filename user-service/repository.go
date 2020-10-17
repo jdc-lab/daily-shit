@@ -10,6 +10,7 @@ import (
 
 type user struct {
 	id           string
+	isAdmin      bool
 	username     string
 	email        string
 	passwordHash string
@@ -30,7 +31,11 @@ func (r *inMemoryRepository) init() {
 	}
 }
 
-func (r *inMemoryRepository) Create(_ context.Context, username string, email string, password string) (string, error) {
+func (r *inMemoryRepository) Count(_ context.Context) int {
+	return len(r.users)
+}
+
+func (r *inMemoryRepository) Create(_ context.Context, isAdmin bool, username string, email string, password string) (string, error) {
 	r.init()
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
@@ -40,6 +45,7 @@ func (r *inMemoryRepository) Create(_ context.Context, username string, email st
 
 	u := user{
 		id:           uuid.New().String(),
+		isAdmin:      isAdmin,
 		username:     username,
 		email:        email,
 		passwordHash: string(hash),

@@ -32,9 +32,9 @@ func (c JwtClaims) Valid() error {
 	return nil
 }
 
-func (a jwtAuthenticator) NewToken(ctx context.Context, userId string) (string, error) {
+func (a jwtAuthenticator) NewToken(_ context.Context, userId string, isAdmin bool) (string, error) {
 	claims := JwtClaims{
-		IsAdmin: true,
+		IsAdmin: isAdmin,
 		UserId:  userId,
 		Expires: time.Now().Add(time.Minute * 15).Unix(),
 	}
@@ -48,7 +48,7 @@ func (a jwtAuthenticator) NewToken(ctx context.Context, userId string) (string, 
 	return tokenString, nil
 }
 
-func (a jwtAuthenticator) Validate(ctx context.Context, tokenString string) (JwtClaims, error) {
+func (a jwtAuthenticator) Validate(_ context.Context, tokenString string) (JwtClaims, error) {
 	var claims JwtClaims
 	token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
 		// Validate expected algorithm
@@ -56,7 +56,6 @@ func (a jwtAuthenticator) Validate(ctx context.Context, tokenString string) (Jwt
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 		return a.secret, nil
 	})
 

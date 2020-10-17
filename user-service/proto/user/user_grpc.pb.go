@@ -20,7 +20,7 @@ type UserServiceClient interface {
 	Create(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	Get(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
-	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
+	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*TokenClaims, error)
 }
 
 type userServiceClient struct {
@@ -58,8 +58,8 @@ func (c *userServiceClient) Auth(ctx context.Context, in *AuthRequest, opts ...g
 	return out, nil
 }
 
-func (c *userServiceClient) ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error) {
-	out := new(ValidateTokenResponse)
+func (c *userServiceClient) ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*TokenClaims, error) {
+	out := new(TokenClaims)
 	err := c.cc.Invoke(ctx, "/user.UserService/ValidateToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ type UserServiceServer interface {
 	Create(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	Get(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	Auth(context.Context, *AuthRequest) (*AuthResponse, error)
-	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
+	ValidateToken(context.Context, *ValidateTokenRequest) (*TokenClaims, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -91,7 +91,7 @@ func (UnimplementedUserServiceServer) Get(context.Context, *GetUserRequest) (*Ge
 func (UnimplementedUserServiceServer) Auth(context.Context, *AuthRequest) (*AuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Auth not implemented")
 }
-func (UnimplementedUserServiceServer) ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error) {
+func (UnimplementedUserServiceServer) ValidateToken(context.Context, *ValidateTokenRequest) (*TokenClaims, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
