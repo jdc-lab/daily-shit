@@ -11,13 +11,13 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
-// registerServiceWithConsul registers a new service to consul
+// RegisterServiceWithConsul registers a new service to consul
 // and also enables a health check using a simple small webserver
 // which gets automatically started.
-// To configure the port you can pass
+// To configure the Port you can pass
 // PRODUCT_SERVICE_PORT and PRODUCT_HEALTH_PORT as environment variable.
 // The default ports are 8100 and 8101.
-func registerServiceWithConsul(serviceName string) {
+func RegisterServiceWithConsul(serviceName string) {
 	// connect to consul
 	config := api.DefaultConfig()
 	consulHost := os.Getenv("CONSUL_HOST")
@@ -32,21 +32,21 @@ func registerServiceWithConsul(serviceName string) {
 
 	// setup registration
 	registration := new(api.AgentServiceRegistration)
-	registration.ID = hostname()
+	registration.ID = Hostname()
 	registration.Name = serviceName
-	address := hostname()
+	address := Hostname()
 	registration.Address = address
-	port, err := strconv.Atoi(port()[1:len(port())])
+	port, err := strconv.Atoi(Port()[1:len(Port())])
 	if err != nil {
-		log.Fatalf("wrong port format %v", err)
+		log.Fatalf("wrong Port format %v", err)
 	}
 	registration.Port = port
 
 	// setup simple health detection using a small webserver
 	registration.Check = new(api.AgentServiceCheck)
-	healthPortNr, err := strconv.Atoi(healthPort()[1:len(healthPort())])
+	healthPortNr, err := strconv.Atoi(HealthPort()[1:len(HealthPort())])
 	if err != nil {
-		log.Fatalf("wrong healt port format %v", err)
+		log.Fatalf("wrong healt Port format %v", err)
 	}
 	registration.Check.HTTP = fmt.Sprintf("http://%s:%v/healthcheck", address, healthPortNr)
 	registration.Check.Interval = "5s"
@@ -56,7 +56,7 @@ func registerServiceWithConsul(serviceName string) {
 	})
 
 	go func() {
-		err := http.ListenAndServe(healthPort(), nil)
+		err := http.ListenAndServe(HealthPort(), nil)
 		log.Fatalf("healthcheck webserver failed %v", err)
 	}()
 
@@ -67,7 +67,7 @@ func registerServiceWithConsul(serviceName string) {
 	}
 }
 
-func port() string {
+func Port() string {
 	p := os.Getenv("PRODUCT_SERVICE_PORT")
 	if len(strings.TrimSpace(p)) == 0 {
 		return ":8100"
@@ -75,7 +75,7 @@ func port() string {
 	return fmt.Sprintf(":%s", p)
 }
 
-func healthPort() string {
+func HealthPort() string {
 	p := os.Getenv("PRODUCT_HEALTH_PORT")
 	if len(strings.TrimSpace(p)) == 0 {
 		return ":8101"
@@ -83,10 +83,10 @@ func healthPort() string {
 	return fmt.Sprintf(":%s", p)
 }
 
-func hostname() string {
+func Hostname() string {
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.Fatalf("retrieving hostname failed %v", err)
+		log.Fatalf("retrieving Hostname failed %v", err)
 	}
 	return hostname
 }

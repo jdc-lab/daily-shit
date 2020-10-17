@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/jdc-lab/daily-shit/common"
 	pb "github.com/jdc-lab/daily-shit/user-service/proto/user"
 
 	"google.golang.org/grpc"
@@ -26,7 +27,7 @@ func main() {
 		log.Fatal("empty secret")
 	}
 
-	listener, err := net.Listen("tcp", port())
+	listener, err := net.Listen("tcp", common.Port())
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -37,7 +38,7 @@ func main() {
 		auth: &jwtAuthenticator{[]byte(*secret)},
 	})
 
-	registerServiceWithConsul("user-service")
+	common.RegisterServiceWithConsul("user-service")
 
 	log.Println("setup finished - starting service")
 	if e := srv.Serve(listener); e != nil {
