@@ -1,0 +1,41 @@
+# GraphQL schema
+#
+# https://gqlgen.com/getting-started/
+
+directive @isAdmin on FIELD_DEFINITION
+directive @isAuthenticated on FIELD_DEFINITION
+
+type CreateUserResponse {
+    id: String!
+}
+
+type LoginUserResponse {
+    id: String!
+    token: String!
+}
+
+type User {
+    id: ID!
+    name: String!
+}
+
+type Query {
+    user: [User!]! @isAuthenticated
+}
+
+input NewUser {
+    username: String!
+    email: String!
+    password: String!
+    isAdmin: Boolean!
+}
+
+input LoginUser {
+    username: String!
+    password: String!
+}
+
+type Mutation {
+    createUser(user: NewUser!): CreateUserResponse! @isAdmin
+    login(user: LoginUser!): LoginUserResponse!
+}

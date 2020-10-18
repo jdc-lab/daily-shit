@@ -9,12 +9,10 @@ RUN apk update && \
     git
 
 RUN mkdir /app
-WORKDIR /app
-
 COPY . /app
+WORKDIR /app/user-service
 
 RUN go mod download
-
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o user-service
 
 FROM alpine:latest

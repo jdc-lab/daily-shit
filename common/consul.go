@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -11,14 +12,7 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
-// RegisterServiceWithConsul registers a new service to consul
-// and also enables a health check using a simple small webserver
-// which gets automatically started.
-// To configure the Port you can pass
-// PRODUCT_SERVICE_PORT and PRODUCT_HEALTH_PORT as environment variable.
-// The default ports are 8100 and 8101.
-func RegisterServiceWithConsul(serviceName string) {
-	// connect to consul
+func connect() *api.Client {
 	config := api.DefaultConfig()
 	consulHost := os.Getenv("CONSUL_HOST")
 	if consulHost != "" {
@@ -29,6 +23,19 @@ func RegisterServiceWithConsul(serviceName string) {
 	if err != nil {
 		log.Fatalf("could not create consul client %v", err)
 	}
+
+	return consul
+}
+
+// RegisterServiceWithConsul registers a new service to consul
+// and also enables a health check using a simple small webserver
+// which gets automatically started.
+// To configure the Port you can pass
+// PRODUCT_SERVICE_PORT and PRODUCT_HEALTH_PORT as environment variable.
+// The default ports are 8100 and 8101.
+func RegisterServiceWithConsul(serviceName string) {
+	// connect to consul
+	consul := connect()
 
 	// setup registration
 	registration := new(api.AgentServiceRegistration)
@@ -52,7 +59,10 @@ func RegisterServiceWithConsul(serviceName string) {
 	registration.Check.Interval = "5s"
 	registration.Check.Timeout = "3s"
 	http.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, `I am alive!`)
+		_, err := fmt.Fprintf(w, `I am alive!`)
+		if err != nil {
+			panic(err)
+		}
 	})
 
 	go func() {
@@ -65,6 +75,26 @@ func RegisterServiceWithConsul(serviceName string) {
 	if err != nil {
 		log.Fatalf("registering to consul failed %v", err)
 	}
+}
+
+func GetRandomServiceWithConsul(serviceName string) *api.ServiceEntry {
+	services := GetServicesWithConsul(serviceName)
+	if len(services) == 0 {
+		return nil
+	}
+
+	return services[rand.Intn(len(services))]
+}
+
+func GetServicesWithConsul(serviceName string) []*api.ServiceEntry {
+	consul := connect()
+
+	services, _, err := consul.Health().Service(serviceName, "", true, &api.QueryOptions{})
+	if err != nil {
+		log.Fatalf("searching for service failed %v", err)
+	}
+
+	return services
 }
 
 func Port() string {
@@ -81,12 +111,4 @@ func HealthPort() string {
 		return ":8101"
 	}
 	return fmt.Sprintf(":%s", p)
-}
-
-func Hostname() string {
-	hostname, err := os.Hostname()
-	if err != nil {
-		log.Fatalf("retrieving Hostname failed %v", err)
-	}
-	return hostname
 }

@@ -28,14 +28,11 @@ type handler struct {
 }
 
 func (h handler) Create(ctx context.Context, request *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-	if request.GetIsAdmin() && (request.GetClaims() == nil || !request.GetClaims().IsAdmin) {
-		return nil, fmt.Errorf("no permissions to create an admin user")
+	if request.GetClaims() == nil {
+		return nil, fmt.Errorf("no permissions to create a new user")
 	}
 
-	// make the first user always admin
-	isAdmin := request.GetIsAdmin() || h.repo.Count(ctx) == 0
-
-	id, err := h.repo.Create(ctx, isAdmin, request.GetUsername(), request.GetEmail(), request.GetPassword())
+	id, err := h.repo.Create(ctx, request.GetIsAdmin(), request.GetUsername(), request.GetEmail(), request.GetPassword())
 	if err != nil {
 		return nil, fmt.Errorf("could not create user %w", err)
 	}

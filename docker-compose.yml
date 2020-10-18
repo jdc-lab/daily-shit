@@ -16,7 +16,8 @@ services:
   user-service:
     hostname: user-service
     build:
-      context: ./user-service
+      context: ./
+      dockerfile: user-service.Dockerfile
     restart: unless-stopped
     environment:
       - JWT_SECRET=REPLACEthisSecret
@@ -25,8 +26,7 @@ services:
       - daily-shit
   user-service2:
     hostname: user-service2
-    build:
-      context: ./user-service
+    image: daily-shit_user-service:latest
     restart: unless-stopped
     environment:
       - JWT_SECRET=REPLACEthisSecret
