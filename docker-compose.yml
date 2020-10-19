@@ -7,7 +7,7 @@ services:
       - 8500:8500
       - 8600:8600/udp
     volumes:
-      # - ./docker/data/consul/data:/consul/data
+      # - ./consul/data:/consul/data
       - ./consul/config:/consul/config
     command: agent -server -ui -node=consul-1 -client=0.0.0.0 -bootstrap -datacenter DailyShit
     networks:

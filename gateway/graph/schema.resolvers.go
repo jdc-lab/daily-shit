@@ -13,15 +13,15 @@ import (
 	"github.com/opentracing/opentracing-go/log"
 )
 
-func (r *mutationResolver) CreateUser(ctx context.Context, user model.NewUser) (*model.CreateUserResponse, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, newUser model.NewUser) (*model.CreateUserResponse, error) {
 	claims := ctx.Value("claims").(*userService.TokenClaims)
 
 	u := userService.CreateUserRequest{
 		Claims:   claims,
-		IsAdmin:  user.IsAdmin,
-		Username: user.Username,
-		Email:    user.Email,
-		Password: user.Password,
+		IsAdmin:  newUser.IsAdmin,
+		Username: newUser.Username,
+		Email:    newUser.Email,
+		Password: newUser.Password,
 	}
 
 	createReq, err := r.UserService.Create(ctx, &u)
@@ -34,10 +34,10 @@ func (r *mutationResolver) CreateUser(ctx context.Context, user model.NewUser) (
 	}, nil
 }
 
-func (r *mutationResolver) Login(ctx context.Context, user model.LoginUser) (*model.LoginUserResponse, error) {
+func (r *mutationResolver) Login(ctx context.Context, username string, password string) (*model.LoginUserResponse, error) {
 	a := userService.AuthRequest{
-		Username: user.Username,
-		Password: user.Password,
+		Username: username,
+		Password: password,
 	}
 
 	authReq, err := r.UserService.Auth(ctx, &a)
@@ -53,8 +53,24 @@ func (r *mutationResolver) Login(ctx context.Context, user model.LoginUser) (*mo
 	}, nil
 }
 
-func (r *queryResolver) User(_ context.Context) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	claims := ctx.Value("claims").(*userService.TokenClaims)
+
+	u := userService.GetUserRequest{
+		Claims: claims,
+		Id:     id,
+	}
+
+	user, err := r.UserService.Get(ctx, &u)
+	if err != nil {
+		return nil, fmt.Errorf("could not get user: %w", err)
+	}
+
+	return &model.User{
+		ID:    user.Id,
+		Name:  user.Username,
+		Email: user.Email,
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

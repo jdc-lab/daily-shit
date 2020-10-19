@@ -60,3 +60,62 @@ This starts the services without docker. Note that they still need a consul inst
 __User service:__
 * optionally if you changed the proto definitions: `go generate ./user-service .`   
 * `make user-service`  
+
+# gateway
+
+The gateway is currently using graphql (just because I wanted to experiment with it).  
+It exposes an api which can be used from the outside.
+
+It exposes a playground ui at http://localhost:8080/ which can be used to test some queries:
+
+Example requests:
+__login__ (admin, admin is automatically available)
+```
+mutation {
+  login(username: "admin", password: "admin") {
+    id
+    token
+  }
+}
+```
+returns  
+```
+{
+  "data": {
+    "login": {
+      "id": "311a96cd-f01f-4148-8454-c7df62577f7d",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc0FkbWluIjp0cnVlLCJ1c2VySWQiOiIzMTFhOTZjZC1mMDFmLTQxNDgtODQ1NC1jN2RmNjI1NzdmN2QiLCJleHBpcmVzIjoxNjAzMTM5MTIyfQ.IMPTE6RmGDIrLX56UQ7-5luXCnWtkomlVr-s-P0DKsM"
+    }
+  }
+}
+```
+
+Now you need to use this token to craft a bearer header.   
+You can do this by setting the HTTP Headers at the bottom of the playground ui:
+```
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc0FkbWluIjp0cnVlLCJ1c2VySWQiOiIzMTFhOTZjZC1mMDFmLTQxNDgtODQ1NC1jN2RmNjI1NzdmN2QiLCJleHBpcmVzIjoxNjAzMTM5MTIyfQ.IMPTE6RmGDIrLX56UQ7-5luXCnWtkomlVr-s-P0DKsM"
+}
+```
+
+After that you can get a user or, if you are admin, create a new one.
+```
+query {
+  user(id:"311a96cd-f01f-4148-8454-c7df62577f7d"){
+    id, name, email
+  }
+}
+```
+
+```
+mutation {
+ 	createUser(newUser:{
+    username: "aligator",
+    email: "aligator@suncraft-server.de",
+    password: "superpassword",
+    isAdmin: false
+  }){
+    id
+  }
+}
+```
