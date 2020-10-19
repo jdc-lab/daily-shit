@@ -99,6 +99,7 @@ You can do this by setting the HTTP Headers at the bottom of the playground ui:
 ```
 
 After that you can get a user or, if you are admin, create a new one.
+__get user__
 ```
 query {
   user(id:"311a96cd-f01f-4148-8454-c7df62577f7d"){
@@ -107,6 +108,7 @@ query {
 }
 ```
 
+__create user__
 ```
 mutation {
  	createUser(newUser:{
