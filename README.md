@@ -98,7 +98,7 @@ You can do this by setting the HTTP Headers at the bottom of the playground ui:
 }
 ```
 
-After that you can get a user or, if you are admin, create a new one.
+After that you can get a user or, if you are admin, create a new one.  
 __get user__
 ```
 query {
