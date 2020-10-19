@@ -30,15 +30,6 @@ so from the outside everything should always go through the gateway.
 
 # Development requirements
 
-* As this repo is currently private, you need to get a github access token and use it for this repo:  
-` git config --global url."https://$(YOUR_NAME):$(YOUR_TOKEN)@github.com/jdc-lab/daily-shit".insteadOf "https://github.com/jdc-lab/daily-shit"`  
-You get the token from Github -> settings -> Developer settings -> Personal access tokens -> Generate new token -> check at least the "repo" scope  
-__Or alternatively__: if you use already an ssh key:
-`git config --global url."git@github.com/jdc-lab/daily-shit".insteadOf "https://github.com/jdc-lab/daily-shit"`
-* Also you have to set the environment variable:  
-`GOPRIVATE=github.com/jdc-lab/daily-shit` (maybe also in your IDE)  
-and for me I had problems with GOSUMDB, that's why I set it to `GOSUMDB=off` for this project. (you may not need this)
-
 * install protoc for go:  
 https://grpc.io/docs/languages/go/quickstart/
 * install gqlgen `go get github.com/99designs/gqlgen`
