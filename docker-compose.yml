@@ -24,12 +24,15 @@ services:
       - CONSUL_HOST=consul-service:8500
     networks:
       - daily-shit
-  user-service2:
-    hostname: user-service2
-    image: daily-shit_user-service:latest
+  gateway:
+    hostname: gateway
+    build:
+      context: ./
+      dockerfile: gateway.Dockerfile
+    ports:
+      - 8080:8080
     restart: unless-stopped
     environment:
-      - JWT_SECRET=REPLACEthisSecret
       - CONSUL_HOST=consul-service:8500
     networks:
       - daily-shit
