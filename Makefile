@@ -22,6 +22,11 @@ user-service:
 	@cd user-service && \
 	${GO_CMD} run . -jwt-secret="${JWT_SECRET_FOR_DEV}"
 
+.PHONY: gateway
+gateway:
+	@cd gateway && \
+	${GO_CMD} run .
+
 .PHONY: all-up
 all-up:
 	@${DOCKER_COMPOSE_CMD} up -d --build

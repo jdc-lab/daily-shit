@@ -244,22 +244,22 @@ directive @isAdmin on FIELD_DEFINITION
 directive @isAuthenticated on FIELD_DEFINITION
 
 type CreateUserResponse {
-    id: String!
+    id: ID!
 }
 
 type LoginUserResponse {
-    id: String!
+    id: ID!
     token: String!
 }
 
 type User {
-    id: String!
+    id: ID!
     name: String!
     email: String!
 }
 
 type Query {
-    user(id: String!): User! @isAuthenticated
+    user(id: ID!): User! @isAuthenticated
 }
 
 input NewUser {
@@ -340,7 +340,7 @@ func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs m
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -419,7 +419,7 @@ func (ec *executionContext) _CreateUserResponse_id(ctx context.Context, field gr
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _LoginUserResponse_id(ctx context.Context, field graphql.CollectedField, obj *model.LoginUserResponse) (ret graphql.Marshaler) {
@@ -454,7 +454,7 @@ func (ec *executionContext) _LoginUserResponse_id(ctx context.Context, field gra
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _LoginUserResponse_token(ctx context.Context, field graphql.CollectedField, obj *model.LoginUserResponse) (ret graphql.Marshaler) {
@@ -761,7 +761,7 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -2421,6 +2421,21 @@ func (ec *executionContext) marshalNCreateUserResponse2ᚖgithubᚗcomᚋjdcᚑl
 		return graphql.Null
 	}
 	return ec._CreateUserResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalID(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNLoginUserResponse2githubᚗcomᚋjdcᚑlabᚋdailyᚑshitᚋgatewayᚋgraphᚋmodelᚐLoginUserResponse(ctx context.Context, sel ast.SelectionSet, v model.LoginUserResponse) graphql.Marshaler {

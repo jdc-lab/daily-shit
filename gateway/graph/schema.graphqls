@@ -6,22 +6,22 @@ directive @isAdmin on FIELD_DEFINITION
 directive @isAuthenticated on FIELD_DEFINITION
 
 type CreateUserResponse {
-    id: String!
+    id: ID!
 }
 
 type LoginUserResponse {
-    id: String!
+    id: ID!
     token: String!
 }
 
 type User {
-    id: String!
+    id: ID!
     name: String!
     email: String!
 }
 
 type Query {
-    user(id: String!): User! @isAuthenticated
+    user(id: ID!): User! @isAuthenticated
 }
 
 input NewUser {
