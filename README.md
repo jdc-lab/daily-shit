@@ -1,4 +1,6 @@
 # daily-shit
+Abandoned: The successor of this microservice-experiment is [scayle](https://github.com/scayle).
+
 DailyShit is an example microservice newspaper.
 
 * frontend:
